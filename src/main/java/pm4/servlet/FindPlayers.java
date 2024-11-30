@@ -27,6 +27,24 @@ public class FindPlayers extends HttpServlet {
        characterJobsDao = CharacterJobsDao.getInstance();
    }
    
+   private String validateSortOrder(String parameter) {
+	    if (parameter == null) return "ASC";
+	    if (parameter.equalsIgnoreCase("asc")) return "ASC";
+	    if (parameter.equalsIgnoreCase("desc")) return "DESC";
+	    return "ASC";
+	}
+
+   private String validateSortColumn(String sortBy) {
+       if (sortBy == null) return null;
+       String column = sortBy.toLowerCase();
+       if (column.equals("name") || column.equals("player") || 
+           column.equals("job") || column.equals("hp") || 
+           column.equals("level")) {
+           return column;
+       }
+       return null;
+   }
+   
    @Override
    public void doGet(HttpServletRequest req, HttpServletResponse resp)
           throws ServletException, IOException {
@@ -71,10 +89,8 @@ public class FindPlayers extends HttpServlet {
           throw new IOException(e);
       }
       
- 
-   // Update the doGet method sorting section:
-      String sortBy = req.getParameter("sortBy");
-      String sortOrder = "asc"; // Default ascending order
+      String sortBy = validateSortColumn(req.getParameter("sortBy"));
+      String sortOrder = validateSortOrder(req.getParameter("sortOrder"));
 
       if (sortBy != null) {
           if (sortBy.equals("name")) {
@@ -83,16 +99,16 @@ public class FindPlayers extends HttpServlet {
                   public int compare(CharacterInfo c1, CharacterInfo c2) {
                       String name1 = c1.getFirstName() + " " + c1.getLastName();
                       String name2 = c2.getFirstName() + " " + c2.getLastName();
-                      return sortOrder.equals("asc") ? name1.compareTo(name2) : name2.compareTo(name1);
+                      return sortOrder.equals("DESC") ? name2.compareTo(name1) : name1.compareTo(name2);
                   }
               });
           } else if (sortBy.equals("player")) {
               Collections.sort(characters, new Comparator<CharacterInfo>() {
                   @Override
                   public int compare(CharacterInfo c1, CharacterInfo c2) {
-                      return sortOrder.equals("asc") ? 
-                          c1.getPlayer().getUserName().compareTo(c2.getPlayer().getUserName()) :
-                          c2.getPlayer().getUserName().compareTo(c1.getPlayer().getUserName());
+                      return sortOrder.equals("DESC") ? 
+                          c2.getPlayer().getUserName().compareTo(c1.getPlayer().getUserName()) :
+                          c1.getPlayer().getUserName().compareTo(c2.getPlayer().getUserName());
                   }
               });
           } else if (sortBy.equals("job")) {
@@ -102,18 +118,18 @@ public class FindPlayers extends HttpServlet {
                       CharacterJobs job1 = characterInfoJobs.get(c1);
                       CharacterJobs job2 = characterInfoJobs.get(c2);
                       if (job1 == null || job2 == null) return 0;
-                      return sortOrder.equals("asc") ?
-                          job1.getJob().getJobName().compareTo(job2.getJob().getJobName()) :
-                          job2.getJob().getJobName().compareTo(job1.getJob().getJobName());
+                      return sortOrder.equals("DESC") ?
+                          job2.getJob().getJobName().compareTo(job1.getJob().getJobName()) :
+                          job1.getJob().getJobName().compareTo(job2.getJob().getJobName());
                   }
               });
           } else if (sortBy.equals("hp")) {
               Collections.sort(characters, new Comparator<CharacterInfo>() {
                   @Override
                   public int compare(CharacterInfo c1, CharacterInfo c2) {
-                      return sortOrder.equals("asc") ?
-                          Integer.compare(c1.getMaxHP(), c2.getMaxHP()) :
-                          Integer.compare(c2.getMaxHP(), c1.getMaxHP());
+                      return sortOrder.equals("DESC") ?
+                          Integer.compare(c2.getMaxHP(), c1.getMaxHP()) :
+                          Integer.compare(c1.getMaxHP(), c2.getMaxHP());
                   }
               });
           } else if (sortBy.equals("level")) {
@@ -123,25 +139,27 @@ public class FindPlayers extends HttpServlet {
                       CharacterJobs job1 = characterInfoJobs.get(c1);
                       CharacterJobs job2 = characterInfoJobs.get(c2);
                       if (job1 == null || job2 == null) return 0;
-                      return sortOrder.equals("asc") ?
-                          Integer.compare(job1.getLevel(), job2.getLevel()) :
-                          Integer.compare(job2.getLevel(), job1.getLevel());
+                      return sortOrder.equals("DESC") ?
+                          Integer.compare(job2.getLevel(), job1.getLevel()) :
+                          Integer.compare(job1.getLevel(), job2.getLevel());
                   }
               });
           }
       }
-
+      
+      
       req.setAttribute("sortBy", sortBy);
       req.setAttribute("sortOrder", sortOrder);
-
-      
-      
       req.setAttribute("characters", characters);
       req.setAttribute("characterJobs", characterInfoJobs);
       
       req.getRequestDispatcher("/FindPlayers.jsp").forward(req, resp);
    }
    
+
+   
+   
+
    @Override
    public void doPost(HttpServletRequest req, HttpServletResponse resp)
            throws ServletException, IOException {
