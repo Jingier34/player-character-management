@@ -203,6 +203,43 @@ public class PlayersDao {
 		       }
 		   }
 		   return players;
+	}
+	//retrieve the player by email
+		public Players getPlayerByEmail(String email) throws SQLException {
+		    String selectPlayer = "SELECT playerID, userName, email FROM Players WHERE email=?;";
+		    Connection connection = null;
+		    PreparedStatement selectStmt = null;
+		    ResultSet results = null;
+		    try {
+		        connection = connectionManager.getConnection();
+		        selectStmt = connection.prepareStatement(selectPlayer);
+		        selectStmt.setString(1, email);
+		        results = selectStmt.executeQuery();
+		        if(results.next()) {
+		            int resultPlayerId = results.getInt("playerID");
+		            String userName = results.getString("userName");
+		            String resultEmail = results.getString("email");
+
+		            Players player = new Players(resultPlayerId, userName, resultEmail);
+		            return player;
+		        }
+		    } catch (SQLException e) {
+		        e.printStackTrace();
+		        throw e;
+		    } finally {
+		        if(connection != null) {
+		            connection.close();
+		        }
+		        if(selectStmt != null) {
+		            selectStmt.close();
+		        }
+		        if(results != null) {
+		            results.close();
+		        }
+		    }
+		    return null;
 		}
+		
+	
 
 }

@@ -5,10 +5,7 @@ import pm4.model.*;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.servlet.annotation.*;
 import javax.servlet.ServletException;
@@ -16,40 +13,18 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-
-/**
- * FindUsers is the primary entry point into the application.
- * 
- * Note the logic for doGet() and doPost() are almost identical. However, there is a difference:
- * doGet() handles the http GET request. This method is called when you put in the /findusers
- * URL in the browser.
- * doPost() handles the http POST request. This method is called after you click the submit button.
- * 
- * To run:
- * 1. Run the SQL script to recreate your database schema: http://goo.gl/86a11H.
- * 2. Insert test data. You can do this by running blog.tools.Inserter (right click,
- *    Run As > JavaApplication.
- *    Notice that this is similar to Runner.java in our JDBC example.
- * 3. Run the Tomcat server at localhost.
- * 4. Point your browser to http://localhost:8080/BlogApplication/findusers.
- */
-
-
-
 @WebServlet("/findplayers")
 public class FindPlayers extends HttpServlet {
    
    protected PlayersDao playersDao;
    protected CharacterInfoDao characterInfoDao;
    protected CharacterJobsDao characterJobsDao;
- 
    
    @Override
    public void init() throws ServletException {
        playersDao = PlayersDao.getInstance();
        characterInfoDao = CharacterInfoDao.getInstance();
        characterJobsDao = CharacterJobsDao.getInstance();
-
    }
    
    @Override
@@ -80,14 +55,13 @@ public class FindPlayers extends HttpServlet {
       try {
           for (Players player : players) {
               List<CharacterInfo> playerCharacters = characterInfoDao.getCharactersByPlayerID(player.getPlayerID());
-           // In both doGet() and doPost() methods, replace the existing characterJobs loop with:
               for (CharacterInfo character : playerCharacters) {
                   characters.add(character);
                   List<CharacterJobs> jobs = characterJobsDao.getCharacterJobsByCharacter(character);
                   for (CharacterJobs job : jobs) {
-                      if (job.isCurrentJob()) {  // Only add current job
+                      if (job.isCurrentJob()) {
                           characterInfoJobs.put(character, job);
-                          break;  // Exit once current job is found
+                          break;
                       }
                   }
               }
@@ -96,6 +70,72 @@ public class FindPlayers extends HttpServlet {
           e.printStackTrace();
           throw new IOException(e);
       }
+      
+ 
+   // Update the doGet method sorting section:
+      String sortBy = req.getParameter("sortBy");
+      String sortOrder = "asc"; // Default ascending order
+
+      if (sortBy != null) {
+          if (sortBy.equals("name")) {
+              Collections.sort(characters, new Comparator<CharacterInfo>() {
+                  @Override
+                  public int compare(CharacterInfo c1, CharacterInfo c2) {
+                      String name1 = c1.getFirstName() + " " + c1.getLastName();
+                      String name2 = c2.getFirstName() + " " + c2.getLastName();
+                      return sortOrder.equals("asc") ? name1.compareTo(name2) : name2.compareTo(name1);
+                  }
+              });
+          } else if (sortBy.equals("player")) {
+              Collections.sort(characters, new Comparator<CharacterInfo>() {
+                  @Override
+                  public int compare(CharacterInfo c1, CharacterInfo c2) {
+                      return sortOrder.equals("asc") ? 
+                          c1.getPlayer().getUserName().compareTo(c2.getPlayer().getUserName()) :
+                          c2.getPlayer().getUserName().compareTo(c1.getPlayer().getUserName());
+                  }
+              });
+          } else if (sortBy.equals("job")) {
+              Collections.sort(characters, new Comparator<CharacterInfo>() {
+                  @Override
+                  public int compare(CharacterInfo c1, CharacterInfo c2) {
+                      CharacterJobs job1 = characterInfoJobs.get(c1);
+                      CharacterJobs job2 = characterInfoJobs.get(c2);
+                      if (job1 == null || job2 == null) return 0;
+                      return sortOrder.equals("asc") ?
+                          job1.getJob().getJobName().compareTo(job2.getJob().getJobName()) :
+                          job2.getJob().getJobName().compareTo(job1.getJob().getJobName());
+                  }
+              });
+          } else if (sortBy.equals("hp")) {
+              Collections.sort(characters, new Comparator<CharacterInfo>() {
+                  @Override
+                  public int compare(CharacterInfo c1, CharacterInfo c2) {
+                      return sortOrder.equals("asc") ?
+                          Integer.compare(c1.getMaxHP(), c2.getMaxHP()) :
+                          Integer.compare(c2.getMaxHP(), c1.getMaxHP());
+                  }
+              });
+          } else if (sortBy.equals("level")) {
+              Collections.sort(characters, new Comparator<CharacterInfo>() {
+                  @Override
+                  public int compare(CharacterInfo c1, CharacterInfo c2) {
+                      CharacterJobs job1 = characterInfoJobs.get(c1);
+                      CharacterJobs job2 = characterInfoJobs.get(c2);
+                      if (job1 == null || job2 == null) return 0;
+                      return sortOrder.equals("asc") ?
+                          Integer.compare(job1.getLevel(), job2.getLevel()) :
+                          Integer.compare(job2.getLevel(), job1.getLevel());
+                  }
+              });
+          }
+      }
+
+      req.setAttribute("sortBy", sortBy);
+      req.setAttribute("sortOrder", sortOrder);
+
+      
+      
       req.setAttribute("characters", characters);
       req.setAttribute("characterJobs", characterInfoJobs);
       
@@ -126,29 +166,26 @@ public class FindPlayers extends HttpServlet {
        
        List<CharacterInfo> characters = new ArrayList<>();
        Map<CharacterInfo, CharacterJobs> characterInfoJobs = new HashMap<>();
-  
        try {
-    	   for (Players player : players) {
-    		    List<CharacterInfo> playerCharacters = characterInfoDao.getCharactersByPlayerID(player.getPlayerID());
-    		
-    		    for (CharacterInfo character : playerCharacters) {
-    		        characters.add(character);
-    		        List<CharacterJobs> jobs = characterJobsDao.getCharacterJobsByCharacter(character);
-    		        for (CharacterJobs job : jobs) {
-    		            if (job.isCurrentJob()) {  // Only add current job
-    		                characterInfoJobs.put(character, job);
-    		                break;  // Exit once current job is found
-    		            }
-    		        }
-    		    }
-    		}
+           for (Players player : players) {
+               List<CharacterInfo> playerCharacters = characterInfoDao.getCharactersByPlayerID(player.getPlayerID());
+               for (CharacterInfo character : playerCharacters) {
+                   characters.add(character);
+                   List<CharacterJobs> jobs = characterJobsDao.getCharacterJobsByCharacter(character);
+                   for (CharacterJobs job : jobs) {
+                       if (job.isCurrentJob()) {
+                           characterInfoJobs.put(character, job);
+                           break;
+                       }
+                   }
+               }
+           }
        } catch (SQLException e) {
            e.printStackTrace();
            throw new IOException(e);
        }
        req.setAttribute("characters", characters);
        req.setAttribute("characterJobs", characterInfoJobs);
-    
        
        req.getRequestDispatcher("/FindPlayers.jsp").forward(req, resp);
    }

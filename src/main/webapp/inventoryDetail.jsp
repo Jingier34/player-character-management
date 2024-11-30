@@ -5,36 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Character Inventory Details</title>
-    <style>
-        .container {
-            width: 80%;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        .character-info {
-            background-color: #f5f5f5;
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 5px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-        th {
-            background-color: #4CAF50;
-            color: white;
-        }
-        tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-    </style>
+    
 </head>
 <body>
     <div class="container">
@@ -48,7 +19,7 @@
 
         <div class="inventory-section">
             <h2>Inventory Details</h2>
-            <table>
+            <table style="text-align: center; border-spacing: 20px; border-collapse: separate;">
                 <thead>
                     <tr>
                         <th>Position</th>

@@ -15,12 +15,12 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/playercreate")
 public class PlayerCreate extends HttpServlet {
     protected PlayersDao playersDao;
-
+    
     @Override
     public void init() throws ServletException {
         playersDao = PlayersDao.getInstance();
     }
-
+    
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
@@ -28,7 +28,7 @@ public class PlayerCreate extends HttpServlet {
         req.setAttribute("messages", messages);
         req.getRequestDispatcher("/CreatePlayer.jsp").forward(req, resp);
     }
-
+    
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
@@ -37,20 +37,25 @@ public class PlayerCreate extends HttpServlet {
 
         String username = req.getParameter("username");
         String email = req.getParameter("email");
-
+        
         if (username == null || username.trim().isEmpty()) {
             messages.put("success", "Invalid Username");
         } else {
             try {
-                Players player = new Players(username, email);
-                player = playersDao.create(player);
-                messages.put("success", "Successfully created " + username);
+                Players existingPlayer = playersDao.getPlayerByEmail(email);
+                if (existingPlayer != null) {
+                    messages.put("success", "Creation failed - Email " + email + " already exists");
+                } else {
+                    Players player = new Players(username, email);
+                    player = playersDao.create(player);
+                    messages.put("success", "Successfully created " + username);
+                }
             } catch (SQLException e) {
                 e.printStackTrace();
                 throw new IOException(e);
             }
         }
-
+        
         req.getRequestDispatcher("/CreatePlayer.jsp").forward(req, resp);
     }
 }
