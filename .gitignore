@@ -1,0 +1,15 @@
+
+.project
+.settings
+# Compiled class files
+*.class
+
+# Logs
+*.log
+
+# Package files
+*.jar
+*.war
+
+# macOS files
+.DS_Stor
