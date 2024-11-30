@@ -30,4 +30,5 @@
         <span id="successMessage"><b>${messages.success}</b></span>
     </p>
 </body>
+ <a href="findplayers?username=${param.searchUsername}" >Back to Search Result</a>
 </html>

@@ -13,5 +13,10 @@
     <servlet-name>FindUsers</servlet-name>
     <url-pattern>/findusers</url-pattern>
   </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>CharacterAttributesServlet</servlet-name>
+    <url-pattern>/attributes</url-pattern>
+</servlet-mapping>
   -->
+
 </web-app>

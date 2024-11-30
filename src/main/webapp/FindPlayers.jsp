@@ -11,7 +11,7 @@
 <title>Find By Player</title>
 </head>
 <body>
-    <form action="findplayers" method="post">
+    <form action="findplayers" method="get">
         <h1>Search for a Player by Name</h1>
         <p>
             <label for="username">User Name:</label>
@@ -41,8 +41,8 @@
                 <td><c:out value="${player.userName}" /></td>
                 <td><c:out value="${player.email}" /></td>
                 <td>
-                    <a href="playerupdate?playerid=${player.playerID}">Update</a> |
-                    <a href="playerdelete?playerid=${player.playerID}">Delete</a>
+                    <a href="playerupdate?playerid=${player.playerID}&searchUsername=${param.username}">Update</a> |
+                    <a href="playerdelete?playerid=${player.playerID}&searchUsername=${param.username}">Delete</a>
                 </td>
             </tr>
         </c:forEach>
@@ -66,11 +66,11 @@
                 <td><c:out value="${character.maxHP}" /></td>
               	<td><c:out value="${characterJobs[character].level}" /></td>
                 <td class="actions">
-				    <a href="CharacterEquipmentServlet?characterID=${character.characterID}">Equipment</a> |
-				    <a href="inventoryDetail?characterID=${character.characterID}">Inventory</a> |
-				    <a href="characterattributes?characterID=${character.characterID}">Attributes</a> |
-				    <a href="characterjobupdate?characterID=${character.characterID}">Update</a> |
-				    <a href="characterdelete?characterID=${character.characterID}">Delete</a>
+				    <a href="CharacterEquipmentServlet?characterID=${character.characterID}&searchUsername=${param.username}">Equipment</a> |
+				    <a href="inventoryDetail?characterID=${character.characterID}&searchUsername=${param.username}">Inventory</a> |
+				    <a href="attributes?characterID=${character.characterID}&searchUsername=${param.username}">Attributes</a> |
+				    <a href="characterjobupdate?characterID=${character.characterID}&searchUsername=${param.username}">Update</a> 
+				
 				</td>
             </tr>
         </c:forEach>

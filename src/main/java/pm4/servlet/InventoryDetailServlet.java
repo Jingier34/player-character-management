@@ -38,7 +38,7 @@ public class InventoryDetailServlet extends HttpServlet {
    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
            throws ServletException, IOException {
        // Get character ID from request parameters
-       String characterIdStr = req.getParameter("characterId");
+       String characterIdStr = req.getParameter("characterID");
        
        if (characterIdStr == null || characterIdStr.trim().isEmpty()) {
            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Character ID is required.");

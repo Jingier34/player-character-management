@@ -76,6 +76,8 @@
                 </tbody>
             </table>
         </div>
+        <a href="findplayers?username=${param.searchUsername}" >Back to Search Result</a>
     </div>
 </body>
+
 </html>

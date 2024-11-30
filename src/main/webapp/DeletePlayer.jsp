@@ -20,10 +20,12 @@
         <p>
             <input type="submit">
         </p>
+ <%--              <input type="hidden" name="searchUsername" value="${searchUsername}"> --%>
     </form>
     <br/><br/>
     <p>
         <span id="successMessage"><b>${messages.success}</b></span>
     </p>
 </body>
+<a href="findplayers?username=${searchUsername}">Back to Search Result</a>
 </html>
