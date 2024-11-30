@@ -51,12 +51,16 @@
     <div style="margin-bottom: 20px;">
         <form id="sortForm" action="findplayers" method="get">
             <label for="sortBy">Sort by column:</label>
-            <input type="text" id="sortBy" name="sortBy" value="${param.sortBy}" placeholder="name/player/job/hp/level">
+            <input type="text" id="sortBy" name="sortBy" value="${param.sortBy}"
+                   placeholder="name/player/job/hp/level">
             <label for="sortOrder">Sort order:</label>
-            <input type="text" id="sortOrder" name="sortOrder" value="${param.sortOrder}" placeholder="asc/desc">
+            <input type="text" id="sortOrder" name="sortOrder" value="${param.sortOrder}" 
+                   placeholder="ASC/DESC">
             <input type="hidden" name="username" value="${param.username}">
             <input type="submit" value="Sort">
         </form>
+        <br/>
+        <span style="color: red;"><b>${messages.sortMessage}</b></span>
     </div>
 
     <table style="text-align: center; border-spacing: 20px; border-collapse: separate;">
