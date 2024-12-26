@@ -39,7 +39,7 @@ public class ConsumableAttributesDao {
         try {
             connection = connectionManager.getConnection();
             insertStmt = connection.prepareStatement(insertConsumableAttr);
-            // 将对象作为参数直接设置
+       
             insertStmt.setInt(1, consumableAttr.getItem().getItemID());
             insertStmt.setInt(2, consumableAttr.getAttribute().getAttributeID());
             insertStmt.setInt(3, consumableAttr.getAttributeBonusCap());
@@ -76,7 +76,7 @@ public class ConsumableAttributesDao {
             results = selectStmt.executeQuery();
 
             if (results.next()) {
-                // 通过 ID 获取完整的 Items 和 Attributes 对象
+             
                 Items item = itemsDao.getItemById(itemId);
                 Attributes attribute = attributesDao.getAttributeByAttributesID(attributeId);
 

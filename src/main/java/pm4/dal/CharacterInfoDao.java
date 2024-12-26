@@ -197,4 +197,45 @@ public class CharacterInfoDao {
 			}
 		}
 	}
+
+	public CharacterInfo getCharacterByFullName(String firstName, String lastName) throws SQLException {
+	    String selectCharacter = 
+	        "SELECT characterID, playerID, firstName, lastName, maxHP " +
+	        "FROM CharacterInfo " +
+	        "WHERE firstName=? AND lastName=?;";
+	    Connection connection = null;
+	    PreparedStatement selectStmt = null;
+	    ResultSet results = null;
+	    try {
+	        connection = connectionManager.getConnection();
+	        selectStmt = connection.prepareStatement(selectCharacter);
+	        selectStmt.setString(1, firstName);
+	        selectStmt.setString(2, lastName);
+	        results = selectStmt.executeQuery();
+	        
+	        PlayersDao playersDao = PlayersDao.getInstance();
+	        if (results.next()) {
+	            int characterID = results.getInt("characterID");
+	            int playerID = results.getInt("playerID");
+	            int maxHP = results.getInt("maxHP");
+	            
+	            Players player = playersDao.getPlayerByID(playerID);
+	            CharacterInfo character = new CharacterInfo(characterID, firstName, lastName, maxHP, player);
+	            return character;
+	        }
+	    } finally {
+	        if (connection != null) {
+	            connection.close();
+	        }
+	        if (selectStmt != null) {
+	            selectStmt.close();
+	        }
+	        if (results != null) {
+	            results.close();
+	        }
+	    }
+	    return null;
+	}
 }
+
+

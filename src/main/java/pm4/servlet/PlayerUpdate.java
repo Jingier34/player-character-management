@@ -14,52 +14,56 @@ import javax.servlet.http.HttpServletResponse;
 
 @WebServlet("/playerupdate")
 public class PlayerUpdate extends HttpServlet {
-    protected PlayersDao playersDao;
+	protected PlayersDao playersDao;
 
-    @Override
-    public void init() throws ServletException {
-        playersDao = PlayersDao.getInstance();
-    }
+	@Override
+	public void init() throws ServletException {
+		playersDao = PlayersDao.getInstance();
+	}
 
-    @Override
-    public void doGet(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
-        Map<String, String> messages = new HashMap<String, String>();
-        req.setAttribute("messages", messages);
-        req.getRequestDispatcher("/UpdatePlayer.jsp").forward(req, resp);
-    }
+	@Override
+	public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		// Maps to store the messages.
+		Map<String, String> messages = new HashMap<String, String>();
+		req.setAttribute("messages", messages);
 
-    @Override
-    public void doPost(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
-        Map<String, String> messages = new HashMap<String, String>();
-        req.setAttribute("messages", messages);
+		String username = req.getParameter("username");
+		if (username == null || username.trim().isEmpty()) {
+			messages.put("success", "Please enter a valid username.");
+		}
 
-        String oldUsername = req.getParameter("oldUsername");
-        String newUsername = req.getParameter("newUsername");
+		req.getRequestDispatcher("/UpdatePlayer.jsp").forward(req, resp);
+	}
 
-        if (oldUsername == null || oldUsername.trim().isEmpty() ||
-                newUsername == null || newUsername.trim().isEmpty()) {
-            messages.put("success", "Invalid Username");
-        } else {
-            try {
-                Players player = playersDao.getPlayerFromUserName(oldUsername);
-                if (player == null) {
-                    messages.put("success", "Player " + oldUsername + " does not exist");
-                } else {
-                    player = playersDao.updatePlayerUserName(player, newUsername);
-                    if (player != null) {
-                        messages.put("success", "Successfully updated " + oldUsername + " to " + newUsername);
-                    } else {
-                        messages.put("success", "Failed to update " + oldUsername);
-                    }
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-                throw new IOException(e);
-            }
-        }
+	@Override
+	public void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		Map<String, String> messages = new HashMap<String, String>();
+		req.setAttribute("messages", messages);
 
-        req.getRequestDispatcher("/UpdatePlayer.jsp").forward(req, resp);
-    }
+		String oldUsername = req.getParameter("oldUsername");
+		String newUsername = req.getParameter("newUsername");
+
+		if (newUsername == null || newUsername.trim().isEmpty()) {
+			messages.put("success", "Please enter a valid new username");
+		} else {
+			try {
+				Players player = playersDao.getPlayerFromUserName(oldUsername);
+				if (player == null) {
+					messages.put("success", "User does not exist.");
+				} else {
+					player = playersDao.updatePlayerUserName(player, newUsername);
+					if (player == null) {
+						messages.put("success", "Failed to update user");
+					} else {
+						messages.put("success", "Successfully updated " + oldUsername + " to " + newUsername);
+					}
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+				throw new IOException(e);
+			}
+		}
+
+		req.getRequestDispatcher("/UpdatePlayer.jsp").forward(req, resp);
+	}
 }

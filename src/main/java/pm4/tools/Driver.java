@@ -107,11 +107,14 @@ public class Driver {
 
             // Create Items and Equipment
             List<Items> items = new ArrayList<>();
+            List<EquippableItems> equippableItems = new ArrayList<>();
             String[] itemNames = {"Excalibur", "Staff of Power", "Holy Shield", "Healing Rod", "Bow of Shadows",
                                 "Battle Axe", "Elven Bow", "Sacred Sword", "Ninja Blades", "Thunder Hammer"};
             
             for (int i = 0; i < 10; i++) {
                 Items item = itemsDao.create(new Items(itemNames[i], 1, true, 35000 + (i * 1500)));
+                System.out.println("Created item with id: " + item.getItemID());
+
                 items.add(item);
                 
                 // Create EquippableItems
@@ -120,7 +123,10 @@ public class Driver {
                                       item.isMarketAllowed(), item.getVendorPrice(),
                                       50, slots.get(0), 50)
                 );
+                System.out.println("Created equippable item with id: " + equippable.getItemID());
 
+                equippableItems.add(equippable);
+                
                 // Create Weapons for first 8 items
                 if (i < 8) {
                     Weapons weapon = weaponsDao.create(
@@ -195,13 +201,21 @@ public class Driver {
             }
 
             // Create Character Equipments
-            for (int i = 0; i < 10; i++) {
-                CharacterEquipments equipment = characterEquipmentsDao.create(
+            for (int i = 2; i < 10; i++) {
+                characterEquipmentsDao.create(
                     new CharacterEquipments(characters.get(i), slots.get(i % slots.size()),
-                                          equippableItemsDao.getById(items.get(i).getItemID()))
+                                          equippableItemsDao.getById(equippableItems.get(i-1).getItemID()))
                 );
-//                System.out.println("Created character equipment for: " + 
-//                                 equipment.getCharacterInfo().getFirstName());
+                
+            }
+            
+            // Create Character Equipments for main_hand
+            for (int i = 0; i < 10; i++) {
+                characterEquipmentsDao.create(
+                    new CharacterEquipments(characters.get(i), slots.get(0),
+                                          equippableItemsDao.getById(equippableItems.get(i).getItemID()))
+                );
+                
             }
 
             // Create Inventory Positions

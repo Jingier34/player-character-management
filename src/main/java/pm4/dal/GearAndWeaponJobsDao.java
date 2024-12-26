@@ -65,7 +65,7 @@ public class GearAndWeaponJobsDao {
             resultSet = statement.executeQuery();
 
             if (resultSet.next()) {
-                // 获取完整的 Items 和 Jobs 对象
+                
                 Items item = itemsDao.getItemById(itemId);
                 Jobs job = jobsDao.getJobById(resultSet.getInt("jobID"));
                 return new GearAndWeaponJobs(item, job);
@@ -100,7 +100,7 @@ public class GearAndWeaponJobsDao {
             resultSet = statement.executeQuery(query);
 
             while (resultSet.next()) {
-                // 获取完整的 Items 和 Jobs 对象
+                
                 Items item = itemsDao.getItemById(resultSet.getInt("itemID"));
                 Jobs job = jobsDao.getJobById(resultSet.getInt("jobID"));
                 items.add(new GearAndWeaponJobs(item, job));

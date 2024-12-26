@@ -185,4 +185,39 @@ public class JobsDao {
 			}
 		}
 	}
+	
+	public Jobs getJobByName(String jobName) throws SQLException {
+	    String selectJob = "SELECT jobID, jobName FROM Jobs WHERE jobName=?;";
+	    Connection connection = null;
+	    PreparedStatement selectStmt = null;
+	    ResultSet results = null;
+	    try {
+	        connection = connectionManager.getConnection();
+	        selectStmt = connection.prepareStatement(selectJob);
+	        selectStmt.setString(1, jobName);
+	        results = selectStmt.executeQuery();
+
+	        if (results.next()) {
+	            int jobID = results.getInt("jobID");
+	            String resultJobName = results.getString("jobName");
+
+	            Jobs job = new Jobs(jobID, resultJobName);
+	            return job;
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        throw e;
+	    } finally {
+	        if (connection != null) {
+	            connection.close();
+	        }
+	        if (selectStmt != null) {
+	            selectStmt.close();
+	        }
+	        if (results != null) {
+	            results.close();
+	        }
+	    }
+	    return null;
+	}
 }
